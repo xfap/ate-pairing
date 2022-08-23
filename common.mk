@@ -9,29 +9,26 @@ CP = cp -f
 AR = ar r
 MKDIR=mkdir -p
 RM=rm -f
-CFLAGS = -fPIC -O3 -fomit-frame-pointer -DNDEBUG -msse2 -mfpmath=sse -march=native
+CFLAGS += -O3 -fomit-frame-pointer -DNDEBUG -msse2 -mfpmath=sse -march=native
 CFLAGS_WARN=-Wall -Wextra -Wformat=2 -Wcast-qual -Wcast-align -Wwrite-strings -Wfloat-equal -Wpointer-arith #-Wswitch-enum -Wstrict-aliasing=2
-CFLAGS_ALWAYS = -D_FILE_OFFSET_BITS=64 -DMIE_ATE_USE_GMP
-LDFLAGS = -lm -lzm $(LIB_DIR) -lgmp -lgmpxx
+CFLAGS_ALWAYS = -D_FILE_OFFSET_BITS=64
+LDFLAGS += -lm -lzm $(LIB_DIR) -lgmp -lgmpxx
 AS = nasm
 AFLAGS = -f elf -D__unix__
 ifeq ($(SUPPORT_SNARK),1)
 CFLAGS += -DBN_SUPPORT_SNARK
 endif
-ifneq ($(VUINT_BIT_LEN),)
-CFLAGS += -D"MIE_ZM_VUINT_BIT_LEN=$(VUINT_BIT_LEN)"
-endif
 
 # for only 64-bit
 BIT=-m64
 #BIT=-m32
-#ifeq ($(shell uname -s),x86_64)
+#ifeq ($(shell uname -m),x86_64)
 #BIT=-m64
 #endif
 #ifeq ($(shell uname -s),Darwin)
 #BIT=-m64
 #endif
-ifeq ($(shell uname -s),Cygwin)
+ifeq ($(shell uname -o),Cygwin)
 # install mingw64-x86_64-gcc-g++
 CXX=x86_64-w64-mingw32-g++
 LD=x86_64-w64-mingw32-g++
@@ -51,5 +48,5 @@ endif
 .c.o:
 	$(CC) -c $< -o $@ $(CFLAGS) $(CFLAGS_WARN) $(CFLAGS_ALWAYS) $(INC_DIR) $(BIT)
 
-INC_DIR+= -I../src -I../include
+INC_DIR+= -I../src -I../../xbyak -I../include $(CPPFLAGS)
 LIB_DIR+= -L../lib
